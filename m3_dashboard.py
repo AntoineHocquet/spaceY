@@ -87,12 +87,12 @@ def get_pie_chart(entered_site):
         )
     else:
         data1=spacex_df[spacex_df['Launch Site']==entered_site]
-        data=data1['class'].value_counts().reset_index()
+        data2=data1['class'].value_counts().reset_index()
         # return the outcomes piechart for a selected site
         fig = px.pie(
-            data,
-            values='class',
-            names='index',
+            data2,
+            values='count',
+            names='class',
             title='Success distribution for ' + entered_site
         )
     return fig
