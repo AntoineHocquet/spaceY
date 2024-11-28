@@ -126,7 +126,7 @@ def get_scatter_plot(entered_site,entered_payload_range):
     else:
         data = spacex_df[spacex_df['Launch Site']==entered_site]
         fig = px.scatter(
-            dataframe = data,
+            data_frame = data,
             x='Payload Mass (kg)',
             y='class',
             color='Booster Version Category',
