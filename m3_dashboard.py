@@ -114,9 +114,11 @@ def get_pie_chart(entered_site):
     )]
 )
 def get_scatter_plot(entered_site,entered_payload_range):
+    payload0, payload1 = entered_payload_range
+    data = spacex_df[spacex_df['Payload Mass (kg)'].between(payload0, payload1)]
     if entered_site == 'ALL':
         fig = px.scatter(
-            data_frame = spacex_df,
+            data_frame = data,
             x='Payload Mass (kg)',
             y='class',
             color='Booster Version Category',  # Color points based on 'category' column
@@ -124,7 +126,7 @@ def get_scatter_plot(entered_site,entered_payload_range):
             labels={"x": "Payload mass in kg", "y": "Sucess or Failure", "category": "Booster Version Category"}
         )
     else:
-        data = spacex_df[spacex_df['Launch Site']==entered_site]
+        data1 = data[data['Launch Site']==entered_site]
         fig = px.scatter(
             data_frame = data,
             x='Payload Mass (kg)',
