@@ -15,36 +15,21 @@ def fetch_html(url: str) -> str:
     response.raise_for_status()
     return response.text
 
-# def parse_launch_table(html: str) -> pd.DataFrame:
-#     """
-#     Parse launch data table from SpaceX Wikipedia page.
-#     """
-#     soup = BeautifulSoup(html, 'html.parser')
-    
-#     # This might change depending on the source; adjust as needed
-#     tables = soup.find_all("table", {"class": "wikitable"})
-#     print(f"Found {len(tables)} wikitable(s)")
-
-#     # Assume first relevant table
-#     df = pd.read_html(str(tables[0]))[0]
-#     print(f"Extracted {len(df)} rows from HTML table.")
-#     return df
-
 def parse_launch_table(html: str) -> pd.DataFrame:
+    """
+    Parse launch data table from SpaceX Wikipedia page.
+    """
     soup = BeautifulSoup(html, 'html.parser')
+    
+    # This might change depending on the source; adjust as needed
     tables = soup.find_all("table", {"class": "wikitable"})
     print(f"Found {len(tables)} wikitable(s)")
 
-    # Preview table structures
-    for i, table in enumerate(tables):
-        print(f"\n--- Table {i} preview ---")
-        try:
-            df = pd.read_html(str(table))[0]
-            print(df.head(2))
-        except Exception as e:
-            print(f"Could not parse table {i}: {e}")
-    
-    return pd.read_html(str(tables[YOUR_INDEX_HERE]))[0]
+    # Relevant table
+    INDEX_LAUNCH_DATA=1
+    df = pd.read_html(str(tables[INDEX_LAUNCH_DATA]))[0]
+    print(f"Extracted {len(df)} rows from HTML table.")
+    return df
 
 
 def save_to_csv(df: pd.DataFrame, output_path: str):
