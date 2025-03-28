@@ -1,0 +1,11 @@
+pandas
+numpy
+matplotlib
+seaborn
+plotly
+dash
+folium
+scikit-learn
+# sqlite3  # (part of Python stdlib, so optional)
+bs4
+lxml
