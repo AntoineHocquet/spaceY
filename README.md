@@ -73,3 +73,12 @@ Docker-ready structure (MLOps best practices)
 Antoine Hocquet
 GitHub Profile | LinkedIn
 MIT Applied DS Program • PhD in Applied Mathematics • 8+ years in academia
+
+
+--- 
+
+## 🚨 Note
+
+This project was inspired by the "IBM Data Science" Coursera specialization.
+Certain parts (e.g., dashboard instructions and dataset) were adapted from educational labs © IBM Corporation.
+
