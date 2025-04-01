@@ -1,6 +1,7 @@
 {
     "spacex_api_url": "https://api.spacexdata.com/v4/launches",
     "spacex_wikipedia_url": "https://en.wikipedia.org/wiki/List_of_Falcon_9_and_Falcon_Heavy_launches",
+    "spacex_wikipedia_url_static": "https://en.wikipedia.org/w/index.php?title=List_of_Falcon_9_and_Falcon_Heavy_launches&oldid=1027686922",
     "output_dir": "data/",
     "api_output_file": "spacex_api_data.csv",
     "web_output_file": "spacex_web_data.csv",

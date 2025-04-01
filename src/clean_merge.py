@@ -52,10 +52,28 @@ def main():
     # Loading the two tables
     df_api, df_web = load_data(api_csv, web_csv)
     df_api_clean = clean_api_data(df_api)
-    df_web_clean = clean_web_data(df_web)
+    # columns:rocket,payloads,launchpad,cores,flight_number,date_utc,date,BoosterVersion,longitude,latitude,launch_site,
+    ## payload_mass,orbit,block,reused_count,serial,outcome,flights,gridfins,reused,legs,landing_pad
 
-    # Merging along
-    df_merged #complete
+    df_web_clean = clean_web_data(df_web)
+    # columns:Flight No.,Launch site,Payload,Payload mass,Orbit,Customer,Launch outcome,Version Booster,Booster landing,Date,Time
+
+    # Merging along ???
+    ## We want a dataframe that contains these columns
+    column_names = [
+    'Flight Number', 
+    'Date', 
+    'Booster Version', 
+    'Payload Mass (kg)', 
+    'Orbit', 
+    'Launch Site', 
+    'Launch Outcome', 
+    'class', 
+    'Booster Version Category'
+]
+    # Create empty DataFrame
+    df_merged = pd.DataFrame(columns=column_names)
+#    df = pd.merge(df_api_clean, df_web_clean, how='left', on='Flight Number')
 
     # Save merged or selected clean DataFrame
     # (Here: saving cleaned API version for dashboard use)

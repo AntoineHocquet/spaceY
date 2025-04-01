@@ -11,7 +11,7 @@ def fetch_spacex_launch_data(api_url: str) -> pd.DataFrame:
     """
     Fetch SpaceX launch data from API and return as a DataFrame.
     Returns: pandas dataframe, containing at least the 6 columns:
-     'name', 'date_utc', 'rocket', 'success', 'payloads', 'launchpad'
+    'rocket', 'payloads', 'launchpad', 'cores', 'flight_number', 'date_utc'
     """
     print(f"Fetching data from {api_url}")
     response = requests.get(api_url)
