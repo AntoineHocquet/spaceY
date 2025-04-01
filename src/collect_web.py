@@ -81,7 +81,7 @@ def extract_mass(table_cells):
     return mass_str
 
 
-def extract_column_from_header(row):
+def extract_column_name_from_header(row):
     """
     Extract and clean the column name from an HTML table row element.
     
@@ -93,46 +93,37 @@ def extract_column_from_header(row):
     """
     # Remove unwanted HTML tags
     for unwanted in ['br', 'a', 'sup']:
-        tag = row.find(unwanted)
-        if tag:
-            tag.extract()
-    
+        for tag in row.find_all(unwanted):
+            tag.decompose()
+
     # Extract and clean the column name
-    column_name = ' '.join(row.contents).strip()
-    
-    # Filter out numeric and empty names
-    if not column_name.isdigit():
+    column_name = ' '.join(
+        str(content).strip() for content in row.contents
+        if isinstance(content, str) or content.name is None
+    ).strip()
+
+    # Filter out numeric and empty names    
+    if column_name and not column_name.isdigit():
         return column_name
+    return None
 
 
-def parse_launch_table(html, table_index=2, return_soup=False):
+def extract_table_headers(html, table_index=2, return_soup=False):
     """
-    Parse launch data table from SpaceX Wikipedia page.
-
-    Args:
-        html: The HTML content of the SpaceX Wikipedia page.
-        table_index: The index of the table to parse (default is 2).
-        return_soup: Whether to return the BeautifulSoup object (default is False).
-
-    Returns:
-        A list of dictionaries containing launch data if `return_soup` is False, otherwise a tuple of a list of dictionaries and a BeautifulSoup object.
+    Extract cleaned column names from a specific HTML table.
     """
     soup = BeautifulSoup(html, 'html.parser')
     tables = soup.find_all("table")
-
     selected_table = tables[table_index]
-    column_names = []
-
-    header_elements = selected_table.find_all(name='th')
-
-    for header in header_elements:
-        column_name = extract_column_from_header(header)
-        if column_name:
-            column_names.append(column_name)
-
-    if return_soup:
-        return column_names, soup
-    return column_names
+    
+    header_elements = selected_table.find_all('th')
+    column_names = [
+        extract_column_name_from_header(header)
+        for header in header_elements
+        if extract_column_name_from_header(header)
+    ]
+    
+    return (column_names, soup) if return_soup else column_names
 
 
 def save_scraped_data_to_csv(scraped_data: pd.DataFrame, output_file_path: str) -> None:
