@@ -81,7 +81,7 @@ def main():
     # cleaning df_api & renaming columns
     df_api_clean = clean_api_data(df_api)
     api_column_map = {
-        'BoosterVersion': 'booster_category' # Falcon 1, Falcon 9 etc.
+        'BoosterVersion': 'booster' # Falcon 1, Falcon 9 etc.
     }
     df_api_std = standardize_columns(df_api, api_column_map)
     print("Column names for API dataframe: ", df_api_std.columns)
@@ -115,13 +115,13 @@ def main():
     'launch_site', 
     'launch_outcome', 
     #'class', # undefined now
-    'booster_category'
+    'booster'
     ]
 
     # Merge safely on 'flight_number'
     merged_df = pd.merge(
         df_web_std,
-        df_api_std[['flight_number', 'booster_version']], #, 'class'
+        df_api_std[['flight_number', 'booster']], #, 'class'
         on='flight_number',
         how='left'
     )
