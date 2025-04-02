@@ -131,10 +131,10 @@ def main():
 
     # Save merged & cleaned version for dashboard use
     merged_df.to_csv(output_csv, index=False)
-    print(f"Data successfully cleaned and merged.")
-    print(f"New dataframe has {merged_df.shape[0]} rows and {merged_df.shape[1]} columns.")
-    print(f"Data successfully saved to {output_csv} for EDA & dashboard use.")
-    print(merged_df.head(10))
+    print(f"\nData successfully cleaned and merged.")
+    print(f"\nNew dataframe has {merged_df.shape[0]} rows and {merged_df.shape[1]} columns.")
+    print(f"\nData successfully saved to {output_csv} for EDA & dashboard use.")
+    print("\nOverview (first ten rows):\n", merged_df.head(10))
 
 if __name__ == "__main__":
     main()
