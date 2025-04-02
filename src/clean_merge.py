@@ -37,7 +37,7 @@ def clean_api_data(df_api, remove_falcon_1=True):
     return df_api
 
 
-def clean_web_data(df_web):
+def clean_web_data(df_web, remove_falcon_1=True):
     """
     Args: pandas dataframe whose columns by default should be:
       Flight No.,Launch site,Payload,Payload mass,Orbit,Customer,
@@ -50,7 +50,7 @@ def clean_web_data(df_web):
     # Remove rows where there is no booster info
     #df_web = df_web[df_web['Version Booster'].notna()]
 
-    return df_web
+    return df_web.copy()
 
 
 def standardize_columns(df, column_map, lowercase=True):
@@ -66,7 +66,35 @@ def standardize_columns(df, column_map, lowercase=True):
     df = df.rename(columns=column_map)
     if lowercase:
         df.columns = [col.lower().strip().replace(" ", "_") for col in df.columns]
+    return df.copy()
+
+
+def create_class_attribute(df,verbose=False):
+    """
+    Uses the 'outcome' attribute to create a list where:
+    - the element is zero if the corresponding row  in  'outcome' is in the set bad_outcome
+    - the element is one otherwise.
+    Then assigns it to the variable 'class'.
+    Args: dataframe
+    Returns: dataframe + new column 'class'
+    """
+    if verbose:
+        print("\nThe landing outcomes are listed as follows:\n", df.outcome.value_counts())
+    
+    # define a set of bad outcomes (for which class is 0)
+    bad_outcomes={'False ASDS', 'False Ocean', 'False RTLS', 'None ASDS', 'None None'}
+
+    landing_class = []
+    # loop to assign
+    for landing_outcome in df.outcome:
+        if landing_outcome in bad_outcomes:
+            landing_class.append(0)
+        else:
+            landing_class.append(1)
+    df['class']=landing_class
+
     return df
+
 
 
 def main():
@@ -83,8 +111,7 @@ def main():
     api_column_map = {
         'BoosterVersion': 'booster' # Falcon 1, Falcon 9 etc.
     }
-    df_api_std = standardize_columns(df_api, api_column_map)
-    print("Column names for API dataframe: ", df_api_std.columns)
+    df_api_std = standardize_columns(df_api_clean, api_column_map)
 
     # cleaning df_web & renaming columns
     df_web_clean = clean_web_data(df_web)
@@ -102,39 +129,42 @@ def main():
         'Time': 'time',
     }
     df_web_std = standardize_columns(df_web, web_column_map)
-    print("Column names for WEB dataframe: ", df_web_std.columns)
 
     # Merging along flight_number
     ## and restricting to relevant columns
     desired_columns = [
     'flight_number', 
-    'date', 
+    'date_utc',
     'booster_version', 
     'payload_mass', 
     'orbit', 
     'launch_site', 
     'launch_outcome', 
     #'class', # undefined now
-    'booster'
+    'booster',
+    'outcome'
     ]
 
     # Merge safely on 'flight_number'
     merged_df = pd.merge(
         df_web_std,
-        df_api_std[['flight_number', 'booster']], #, 'class'
+        df_api_std[['flight_number', 'booster', 'outcome', 'date_utc']], #, 'class'
         on='flight_number',
-        how='left'
+        how='inner' # keeps only the launches that are present in both frames
     )
 
     # keep only the desired columns
     merged_df = merged_df[desired_columns]
 
+    # create 'class' attribute for logistic regression
+    df_final = create_class_attribute(merged_df,verbose=True)
+
     # Save merged & cleaned version for dashboard use
-    merged_df.to_csv(output_csv, index=False)
+    df_final.to_csv(output_csv, index=False)
     print(f"\nData successfully cleaned and merged.")
-    print(f"\nNew dataframe has {merged_df.shape[0]} rows and {merged_df.shape[1]} columns.")
+    print(f"\nNew dataframe has {df_final.shape[0]} rows and {df_final.shape[1]} columns.")
     print(f"\nData successfully saved to {output_csv} for EDA & dashboard use.")
-    print("\nOverview (first ten rows):\n", merged_df.head(10))
+    print("\nOverview (first ten rows):\n", df_final.head(10))
 
 if __name__ == "__main__":
     main()
