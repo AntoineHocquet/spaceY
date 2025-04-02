@@ -6,6 +6,7 @@
 
 import sqlite3
 import pandas as pd
+from tabulate import tabulate
 
 
 def run_query(database_path: str, query: str) -> pd.DataFrame:
@@ -89,8 +90,13 @@ def get_success_rate_by_payload_range(min_payload: float, max_payload: float):
     """
 
 
-# Run queries directly for debugging
+# Inspect the table schema (structure) with PRAGMA
 if __name__ == '__main__':
     db_path = "data/SpaceX.db"
-    query = get_successful_launches_by_site()
-    print(run_query(db_path, query))
+
+    # Special SQLite command to describe the table schema
+    query = "PRAGMA table_info(SPACEXTBL);"
+    schema_df = run_query(db_path,query)
+    #print(schema_df)
+    print(tabulate(schema_df, headers='keys', tablefmt='psql'))
+

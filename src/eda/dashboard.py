@@ -1,16 +1,19 @@
 # Import required libraries
 import pandas as pd
 import dash
-import dash_html_components as html
-import dash_core_components as dcc
+from dash import html, dcc
 from dash.dependencies import Input, Output
 import plotly.express as px
+from pathlib import Path
+
+
+DATA_PATH = Path("data/spacex_launch_dash.csv") 
 
 # Read the airline data into pandas dataframe
-spacex_df = pd.read_csv("spacex_launch_dash.csv")
-max_payload = spacex_df['Payload Mass (kg)'].max()
-min_payload = spacex_df['Payload Mass (kg)'].min()
-launch_sites = spacex_df['Launch Site'].unique()  # Get unique launch site names
+spacex_df = pd.read_csv(DATA_PATH)
+max_payload = spacex_df['payload_mass'].max()
+min_payload = spacex_df['payload_mass'].min()
+launch_sites = spacex_df['launch_site'].unique()  # Get unique launch site names
 
 # Create a dash application
 app = dash.Dash(__name__)
@@ -115,23 +118,23 @@ def get_pie_chart(entered_site):
 )
 def get_scatter_plot(entered_site,entered_payload_range):
     payload0, payload1 = entered_payload_range
-    data = spacex_df[spacex_df['Payload Mass (kg)'].between(payload0, payload1)]
+    data = spacex_df[spacex_df['payload_mass'].between(payload0, payload1)]
     if entered_site == 'ALL':
         fig = px.scatter(
             data_frame = data,
-            x='Payload Mass (kg)',
+            x='payload_mass',
             y='class',
-            color='Booster Version Category',  # Color points based on 'category' column
+            color='booster_version',  # Color points based on 'category' column
             title="Success vs payload for all sites",
             labels={"x": "Payload mass in kg", "y": "Sucess or Failure", "category": "Booster Version Category"}
         )
     else:
-        data1 = data[data['Launch Site']==entered_site]
+        data1 = data[data['launch_site']==entered_site]
         fig = px.scatter(
             data_frame = data,
-            x='Payload Mass (kg)',
+            x='payload_mass',
             y='class',
-            color='Booster Version Category',
+            color='booster_version',
             title="Success vs payload for " + entered_site,
             labels={"x": "Payload mass in kg", "y": "Sucess or Failure", "category": "Booster Version Category"}
         )
@@ -139,4 +142,4 @@ def get_scatter_plot(entered_site,entered_payload_range):
 
 # Run the app
 if __name__ == '__main__':
-    app.run_server()
+    app.run()
