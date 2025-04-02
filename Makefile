@@ -20,6 +20,9 @@ collect-web:
 clean-merge:
 	PYTHONPATH=. python src/clean_merge.py
 
+create-db:
+	PYTHONPATH=. python src/utils/create_db_from_csv.py
+
 run-all: collect-api collect-web clean-merge
 
 # === Dev tools ===
