@@ -11,37 +11,63 @@ def load_data(api_path: str, web_path: str):
     print(f"Loaded Web data: {df_web.shape} rows")
     return df_api, df_web
 
-def clean_api_data(df_api: pd.DataFrame) -> pd.DataFrame:
-    # Select relevant columns
-    cols = [
-        'name', 'date_utc', 'rocket', 'success', 'payloads', 'launchpad'
-    ]
-    df = df_api[cols].copy()
 
+def clean_api_data(df_api, remove_falcon_1=True):
+    """"
+    Input: pandas dataframe whose columns should be:
+      rocket,payloads,launchpad,cores,flight_number,date_utc,date,BoosterVersion,
+      longitude,latitude,launch_site,payload_mass,orbit,block,reused_count,serial,outcome,flights,
+      gridfins,reused,legs & landing_pad
+    Output: same dataframe but with corrected types and removed falcon 1 flights by default
+    """
     # Convert types
-    df['date'] = pd.to_datetime(df['date_utc'])
-    df['success'] = df['success'].astype('Int64')  # Allows NaNs
+    df_api['date'] = pd.to_datetime(df_api['date_utc'])
+    # df_api['outcome'] = df_api['outcome'].astype('Int64')  # Allows NaNs
 
-    # Rename for consistency
-    df = df.rename(columns={
-        'name': 'Mission',
-        'success': 'class',
-        'launchpad': 'Launch Site',
-    })
+    # Removes Falcon 1 booster version to keep only Falcon 9
+    if remove_falcon_1:
+        df_api=df_api[df_api['BoosterVersion']!='Falcon 1']
+        print("Falcon 1 entries have been removed.")
+    
+    # Calculate the mean of PayloadMass column to replace the np.nan values
+    mean_payload = df_api['payload_mass'].mean()
+    df_api['payload_mass'].fillna(mean_payload, inplace=True)
+    print("Missing Payload Mass entries have been replaced by mean value.")
 
-    return df
+    return df_api
 
-def clean_web_data(df_web: pd.DataFrame) -> pd.DataFrame:
+
+def clean_web_data(df_web):
+    """
+    Args: pandas dataframe whose columns by default should be:
+      Flight No.,Launch site,Payload,Payload mass,Orbit,Customer,
+      Launch outcome,Version Booster,Booster landing,Date,Time
+    Returns: Cleaner dataframe
+    """
     # Drop unnamed columns or footnotes if any
     df_web = df_web.loc[:, ~df_web.columns.str.contains('^Unnamed')]
 
-    # Optional: remove rows where there is no booster info
-    df_web = df_web[df_web['Booster version'].notna()]
-
-    # Clean up column names
-    df_web.columns = df_web.columns.str.strip().str.replace('\n', ' ').str.replace(r'\[.*?\]', '', regex=True)
+    # Remove rows where there is no booster info
+    #df_web = df_web[df_web['Version Booster'].notna()]
 
     return df_web
+
+
+def standardize_columns(df, column_map, lowercase=True):
+    """
+    Renames columns of a DataFrame based on a provided mapping.
+    Args:
+    - df (pd.DataFrame): The input DataFrame.
+    - column_map (dict): Dictionary mapping current column names to standardized ones.
+    - lowercase (bool): Whether to lowercase all column names after renaming.
+    Returns:
+    - pd.DataFrame: A copy of the DataFrame with standardized column names.
+    """
+    df = df.rename(columns=column_map)
+    if lowercase:
+        df.columns = [col.lower().strip().replace(" ", "_") for col in df.columns]
+    return df
+
 
 def main():
     config = load_config()
@@ -51,34 +77,64 @@ def main():
 
     # Loading the two tables
     df_api, df_web = load_data(api_csv, web_csv)
+
+    # cleaning df_api & renaming columns
     df_api_clean = clean_api_data(df_api)
-    # columns:rocket,payloads,launchpad,cores,flight_number,date_utc,date,BoosterVersion,longitude,latitude,launch_site,
-    ## payload_mass,orbit,block,reused_count,serial,outcome,flights,gridfins,reused,legs,landing_pad
+    api_column_map = {
+        'BoosterVersion': 'booster_category' # Falcon 1, Falcon 9 etc.
+    }
+    df_api_std = standardize_columns(df_api, api_column_map)
+    print("Column names for API dataframe: ", df_api_std.columns)
 
+    # cleaning df_web & renaming columns
     df_web_clean = clean_web_data(df_web)
-    # columns:Flight No.,Launch site,Payload,Payload mass,Orbit,Customer,Launch outcome,Version Booster,Booster landing,Date,Time
+    web_column_map = {
+        'Flight No.': 'flight_number',
+        'Launch site': 'launch_site',
+        'Payload': 'payload',
+        'Payload Mass (kg)': 'payload_mass',
+        'Orbit': 'orbit',
+        'Customer': 'customer',
+        'Launch Outcome': 'launch_outcome',
+        'Version Booster': 'booster_version',
+        'Booster landing': 'booster_landing',
+        'Date': 'date',
+        'Time': 'time',
+    }
+    df_web_std = standardize_columns(df_web, web_column_map)
+    print("Column names for WEB dataframe: ", df_web_std.columns)
 
-    # Merging along ???
-    ## We want a dataframe that contains these columns
-    column_names = [
-    'Flight Number', 
-    'Date', 
-    'Booster Version', 
-    'Payload Mass (kg)', 
-    'Orbit', 
-    'Launch Site', 
-    'Launch Outcome', 
-    'class', 
-    'Booster Version Category'
-]
-    # Create empty DataFrame
-    df_merged = pd.DataFrame(columns=column_names)
-#    df = pd.merge(df_api_clean, df_web_clean, how='left', on='Flight Number')
+    # Merging along flight_number
+    ## and restricting to relevant columns
+    desired_columns = [
+    'flight_number', 
+    'date', 
+    'booster_version', 
+    'payload_mass', 
+    'orbit', 
+    'launch_site', 
+    'launch_outcome', 
+    #'class', # undefined now
+    'booster_category'
+    ]
 
-    # Save merged or selected clean DataFrame
-    # (Here: saving cleaned API version for dashboard use)
-    df_merged.to_csv(output_csv, index=False)
-    print(f"Cleaned data saved to {output_csv}")
+    # Merge safely on 'flight_number'
+    merged_df = pd.merge(
+        df_web_std,
+        df_api_std[['flight_number', 'booster_version']], #, 'class'
+        on='flight_number',
+        how='left'
+    )
+
+    # keep only the desired columns
+    merged_df = merged_df[desired_columns]
+
+    # Save merged & cleaned version for dashboard use
+    merged_df.to_csv(output_csv, index=False)
+    print(f"Data successfully cleaned and merged.")
+    print(f"New dataframe has {merged_df.shape[0]} rows and {merged_df.shape[1]} columns.")
+    print(f"Data successfully saved to {output_csv} for EDA & dashboard use.")
+    print(merged_df.head(10))
 
 if __name__ == "__main__":
     main()
