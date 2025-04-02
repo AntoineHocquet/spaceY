@@ -81,15 +81,15 @@ app.layout = html.Div(
 def get_pie_chart(entered_site):
     print(f"Entered site: {entered_site}")  # Debugging line to print selected site
     if entered_site == 'ALL':
-        data = spacex_df.groupby('Launch Site')['class'].sum().reset_index()
+        data = spacex_df.groupby('launch_site')['class'].sum().reset_index()
         fig = px.pie(
             data,
             values='class',
-            names='Launch Site',
+            names='launch_site',
             title='Launch site success distribution'
         )
     else:
-        data1=spacex_df[spacex_df['Launch Site']==entered_site]
+        data1=spacex_df[spacex_df['launch_site']==entered_site]
         data2=data1['class'].value_counts().reset_index()
         # return the outcomes piechart for a selected site
         fig = px.pie(

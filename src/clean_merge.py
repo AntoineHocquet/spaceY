@@ -17,7 +17,7 @@ def clean_api_data(df_api, remove_falcon_1=True):
     Input: pandas dataframe whose columns should be:
       rocket,payloads,launchpad,cores,flight_number,date_utc,date,BoosterVersion,
       longitude,latitude,launch_site,payload_mass,orbit,block,reused_count,serial,outcome,flights,
-      gridfins,reused,legs & landing_pad
+      gridfins,reused,legs,landing_pad
     Output: same dataframe but with corrected types and removed falcon 1 flights by default
     """
     # Convert types
@@ -107,7 +107,7 @@ def main():
     df_api, df_web = load_data(api_csv, web_csv)
 
     # cleaning df_api & renaming columns
-    df_api_clean = clean_api_data(df_api)
+    df_api_clean = clean_api_data(df_api,remove_falcon_1=False)
     api_column_map = {
         'BoosterVersion': 'booster' # Falcon 1, Falcon 9 etc.
     }
@@ -130,33 +130,15 @@ def main():
     }
     df_web_std = standardize_columns(df_web, web_column_map)
 
-    # Merging along flight_number
-    ## and restricting to relevant columns
-    desired_columns = [
-    'flight_number', 
-    'date_utc',
-    'booster_version', 
-    'payload_mass', 
-    'orbit', 
-    'launch_site', 
-    'launch_outcome', 
-    #'class', # undefined now
-    'booster',
-    'outcome'
-    ]
-
-    # Merge safely on 'flight_number'
+    # Merging along flight_number & keep only the desired columns
     merged_df = pd.merge(
-        df_web_std,
-        df_api_std[['flight_number', 'booster', 'outcome', 'date_utc']], #, 'class'
+        df_api_std[['flight_number', 'booster', 'payload_mass', 'outcome', 'date_utc', 'longitude', 'latitude']],
+        df_web_std[['flight_number', 'booster_version', 'orbit', 'launch_site']], # 'launch_outcome' not necessary
         on='flight_number',
         how='inner' # keeps only the launches that are present in both frames
     )
 
-    # keep only the desired columns
-    merged_df = merged_df[desired_columns]
-
-    # create 'class' attribute for logistic regression
+    # create 'class' attribute for eda and logistic regression (later)
     df_final = create_class_attribute(merged_df,verbose=True)
 
     # Save merged & cleaned version for dashboard use

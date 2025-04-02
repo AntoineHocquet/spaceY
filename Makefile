@@ -23,6 +23,9 @@ clean-merge:
 create-db:
 	PYTHONPATH=. python src/utils/create_db_from_csv.py
 
+dashboard:
+	PYTHONPATH=. python src/eda/dashboard.py
+
 run-all: collect-api collect-web clean-merge
 
 # === Dev tools ===
