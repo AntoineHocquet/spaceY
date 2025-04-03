@@ -132,7 +132,7 @@ def main():
 
     # Merging along flight_number & keep only the desired columns
     merged_df = pd.merge(
-        df_api_std[['flight_number', 'booster', 'payload_mass', 'outcome', 'date_utc', 'longitude', 'latitude']],
+        df_api_std[['flight_number', 'booster', 'payload_mass', 'outcome', 'date_utc', 'longitude', 'latitude', 'reused', 'reused_count', 'serial', 'landing_pad', 'gridfins', 'legs']],
         df_web_std[['flight_number', 'booster_version', 'orbit', 'launch_site']], # 'launch_outcome' not necessary
         on='flight_number',
         how='inner' # keeps only the launches that are present in both frames

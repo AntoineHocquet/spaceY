@@ -1,0 +1,52 @@
+.
+├── config
+│   └── config.json
+├── docs
+│   └── eda_outputs
+│       ├── booster_version_counts.png
+│       ├── landing_outcome_distribution.png
+│       └── payload_vs_success.png
+├── Makefile
+├── models
+├── notebooks
+│   ├── m1_data-collection-api.ipynb
+│   ├── m1_data-wrangling.ipynb
+│   ├── m1_webscraping.ipynb
+│   ├── m2_eda-dataviz.ipynb
+│   ├── m2_eda-sql-coursera_sqllite.ipynb
+│   ├── m3_dashboard_instructions.pdf
+│   ├── m3_launch_site_location.ipynb
+│   ├── m4_machine-learning-prediction.ipynb
+│   └── map_launches.html
+├── README.md
+├── requirements.txt
+├── src
+│   ├── clean_merge.py
+│   ├── collect_api.py
+│   ├── collect_web.py
+│   ├── eda
+│   │   ├── dashboard.py
+│   │   ├── sql_queries.py
+│   │   └── visualizations.py
+│   ├── __init__.py
+│   ├── __pycache__
+│   │   ├── collect_api.cpython-312.pyc
+│   │   ├── collect_web.cpython-312.pyc
+│   │   └── __init__.cpython-312.pyc
+│   └── utils
+│       ├── config_loader.py
+│       ├── create_db_from_csv.py
+│       └── __pycache__
+│           └── config_loader.cpython-312.pyc
+├── structure_repo.txt
+└── tests
+    ├── __init__.py
+    ├── __pycache__
+    │   ├── __init__.cpython-312.pyc
+    │   ├── test_collect_api.cpython-312-pytest-8.3.5.pyc
+    │   ├── test_collect_web.cpython-312-pytest-8.3.5.pyc
+    │   └── test_html_helpers.cpython-312-pytest-8.3.5.pyc
+    ├── test_collect_api.py
+    └── test_html_helpers.py
+
+13 directories, 37 files

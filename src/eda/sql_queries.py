@@ -97,6 +97,8 @@ if __name__ == '__main__':
     # Special SQLite command to describe the table schema
     query = "PRAGMA table_info(SPACEXTBL);"
     schema_df = run_query(db_path,query)
-    #print(schema_df)
     print(tabulate(schema_df, headers='keys', tablefmt='psql'))
+
+    query1 = get_all_launches()
+    print(tabulate(run_query(db_path, query1)))
 
