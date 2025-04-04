@@ -43,7 +43,7 @@ def plot_payload_vs_success(df):
     plt.close()
 
 
-def run_all():
+def generate_all():
     df = load_data()
     plot_landing_distribution(df)
     plot_booster_versions(df)
@@ -52,4 +52,4 @@ def run_all():
 
 
 if __name__ == "__main__":
-    run_all()
+    generate_all()
