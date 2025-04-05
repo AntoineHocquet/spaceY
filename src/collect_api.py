@@ -157,6 +157,10 @@ def main():
     data['reused'] = reused_list
     data['legs'] = legs_list
     data['landing_pad'] = landing_pad_list
+
+    #delete cores column
+    data = data.drop('cores', axis=1)
+
     df = pd.DataFrame(data)
     save_to_csv(df, output_path)
 
