@@ -15,6 +15,7 @@ def select_features(df, desired_features=['flight_number','booster',
     """
     Select relevant features from the input dataframe.
     """
+    
     XX=df[desired_features].copy()
     return XX
 
