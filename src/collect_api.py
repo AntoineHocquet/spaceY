@@ -6,6 +6,7 @@ import os
 import datetime
 from src.utils.config_loader import load_config
 
+API_LIMIT_DATE = '2022-12-31'# replace by '2021-11-13' for consistency with static web url
 
 def fetch_spacex_launch_data(api_url: str) -> pd.DataFrame:
     """
@@ -34,7 +35,8 @@ def fetch_spacex_launch_data(api_url: str) -> pd.DataFrame:
     data['date'] = pd.to_datetime(data['date_utc']).dt.date
     
     # Using the date we will restrict the dates of the launches
-    data = data[data['date'] <= datetime.date(2020, 11, 13)]
+    year, month, day = API_LIMIT_DATE.split('-')
+    data = data[data['date'] <= datetime.date(int(year), int(month), int(day))] # initially 2020-11-13 for consistency with static web_url
     print(f"Retrieved {len(data)} launches.")
     return data
 

@@ -43,8 +43,8 @@ def clean_api_data(df_api, remove_falcon_1=True):
     return df_api
 
 
-def clean_Version_Booster(Version):
-    """ cleans the 'Version Booster' column"""
+def clean_string_series(Version):
+    """ cleans a pandas series of strings"""
     Version = Version.apply(lambda x: re.sub(r'[^\w\s\.]', '', str(x)))
     return Version
 
@@ -60,7 +60,7 @@ def clean_web_data(df_web, remove_falcon_1=True):
     df_web = df_web.loc[:, ~df_web.columns.str.contains('^Unnamed')]
 
     # cleans the 'Version Booster' column
-    df_web['Version Booster'] = clean_Version_Booster(df_web['Version Booster'])
+    df_web['Version Booster'] = clean_string_series(df_web['Version Booster'])
     df_web['Version Booster'] = df_web['Version Booster'].str.strip()
 
     return df_web.copy()
@@ -146,7 +146,7 @@ def main():
     # Merging along flight_number & keep only the desired columns
     merged_df = pd.merge(
         df_api_std[['flight_number', 'booster', 'payload_mass', 'outcome', 'date', 'longitude', 'latitude', 'reused', 'reused_count', 'serial', 'landing_pad', 'gridfins', 'legs']],
-        df_web_std[['flight_number', 'booster_version', 'orbit', 'launch_site']], # 'launch_outcome' not necessary
+        df_web_std[['flight_number', 'booster_version', 'orbit', 'launch_site', 'launch_outcome', 'customer']],
         on='flight_number',
         how='inner' # keeps only the launches that are present in both frames
     )
