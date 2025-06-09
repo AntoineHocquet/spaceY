@@ -5,3 +5,7 @@ venv/
 # Ignore data & cache
 __pycache__/
 data/
+
+# Ignore launch_site_location notebook
+notebooks/launch_site_location.ipynb
+

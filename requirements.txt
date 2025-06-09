@@ -5,6 +5,7 @@ seaborn
 plotly
 dash
 folium
+geopy
 scikit-learn
 # sqlite3  # (part of Python stdlib, so optional)
 bs4
