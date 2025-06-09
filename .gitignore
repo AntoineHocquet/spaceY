@@ -9,3 +9,8 @@ data/
 # Ignore launch_site_location notebook
 notebooks/launch_site_location.ipynb
 
+
+m1_*.ipynb
+m2_*.ipynb
+m3_*.ipynb
+m4_*.ipynb
